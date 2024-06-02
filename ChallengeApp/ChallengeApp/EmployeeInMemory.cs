@@ -1,31 +1,35 @@
 ﻿namespace ChallengeApp
 {
-    public class Employee : IEmployee
+    public class EmployeeInMemory : EmployeeBase // : IEmployee
     {
+        public delegate void GradeAddedDelegate(object sender,EventArgs args);
+
+        public  event GradeAddedDelegate GradeAdded;
+
         public List<float> grades = new List<float>();
 
-        public Employee(string name, string surname)
+        public EmployeeInMemory(string name, string surname)
+            : base(name, surname)
         {
-            this.Surname = surname;
+
         }
 
-        public string Name { get; private set; }
-
-        public string Surname { get; private set; }
-
-        public event EmployeeInMemory.GradeAddedDelegate GradeAdded;
-
-        public void AddGrade(float grade)
+        public override void SayHello()
         {
-            // 3.99
-            // 3
-            int valueInInt = (int)grade;
-            float f = valueInInt;
+            Console.WriteLine("HI!!!");
+            base.SayHello();
+        }
 
-
+        public override void AddGrade(float grade)
+        {
             if (grade >= 0 && grade <= 100)
             {
                 this.grades.Add(grade);
+
+                if(GradeAdded != null)
+                {
+                    GradeAdded(this, new EventArgs());
+                }
             }
             else
             {
@@ -33,19 +37,19 @@
             }
         }
 
-        public void AddGrade(double grade)
+        public override void AddGrade(double grade)
         {
             double gradeAsFloat = (double)grade;
             this.AddGrade(gradeAsFloat);
         }
 
-        public void AddGrade(int grade)
+        public override void AddGrade(int grade)
         {
-            int gradeAsFloat = grade;
+            float gradeAsFloat = grade;
             this.AddGrade(gradeAsFloat);
         }
 
-        public void AddGrade(char grade)
+        public override void AddGrade(char grade)
         {
             switch (grade)
             {
@@ -68,10 +72,12 @@
                 default:
                     throw new Exception("Wrong letter");
                     break;
+                
             }
         }
+    
 
-        public void AddGrade(string grade)
+        public override void AddGrade(string grade)
         {
             if (float.TryParse(grade, out float result))
             {
@@ -86,11 +92,7 @@
         public Statistics GetStatistics()
         {
             var statistics = new Statistics();
-       
-            foreach (var grade in this.grades)
-            {
-                statistics.AddGrade(grade);
-            }
+  
 
             return statistics;
         }
